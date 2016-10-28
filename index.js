@@ -1,11 +1,12 @@
 'use strict';
 
+const Promise = require('bluebird');
 const LastfmAPI = require('lastfmapi');
 let TelegramBot = require('./telegram-bot');
 
 const lfm = new LastfmAPI({
-    'api_key' : '',
-    'secret' : ''
+    api_key: '',
+    secret: ''
 });
 
 const cfg = {
@@ -14,4 +15,5 @@ const cfg = {
 
 TelegramBot = new TelegramBot(function() {
     console.log('Starting Last.fm Telegram Bot...');
+    Promise.promisifyAll(lfm.user);
 }, lfm, cfg);

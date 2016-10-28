@@ -4,12 +4,13 @@
   "description": "last.fm service bot for telegram",
   "main": "index.js",
   "dependencies": {
+    "bluebird": "^3.4.6",
     "lastfmapi": "^0.1.1",
     "node-telegram-bot-api": "^0.24.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node .",
+    "start": "node --harmony .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -15,9 +15,9 @@ class TelegramBot {
     events(bot) {
         bot.on('message', (msg) => this.cmdNowPlaying(msg));
 
-        bot.on('inline_query', (query) => {
-            this.lfm.user.getRecentTracks({user: 'avidori', limit: 1}, (err, res) => {
-                if (err) throw err;
+        bot.on('inline_query', async (query) => {
+            try {
+                let res = await this.lfm.user.getRecentTracksAsync({user: 'avidori', limit: 1});
                 let track = this.getNowPlaying(res);
                 let thumbnails = this.getThumbnails(track, 1);
                 bot.answerInlineQuery(query.id, [{
@@ -32,16 +32,18 @@ class TelegramBot {
                         disable_web_page_preview: true
                     }
                 }], { cache_time: 0 });
-            });
+            }
+            catch (err) { throw err; }
         });
     }
 
-    cmdNowPlaying(msg) {
-        this.lfm.user.getRecentTracks({user: 'avidori', limit: 1}, (err, res) => {
-            if (err) throw err;
-            let track = this.getNowPlaying(res);
+    async cmdNowPlaying(msg) {
+        try {
+            let recentTracks = await this.lfm.user.getRecentTracksAsync({user: 'avidori', limit: 1});
+            let track = this.getNowPlaying(recentTracks);
             this.bot.sendMessage(msg.from.id, `Now playing: ${track.name} by ${track.artist}`);
-        });
+        }
+        catch (err) { throw err; }
     }
 
     getNowPlaying(recentTracks) {
