@@ -16,6 +16,12 @@ class TelegramBot {
     events(bot) {
         bot.on('message', (msg) => this.cmdNowPlaying(msg));
 
+        bot.onText(/\/set (.+)/, (msg, match) => {
+            let user = match[1];
+            this.usr.set(msg.from.id, user);
+            bot.sendMessage(msg.from.id, `Tracking username set to ${user}`);
+        });
+
         bot.on('inline_query', async (query) => {
             try {
                 let res = await this.lfm.user.getRecentTracksAsync({user: await this.usr.get(msg.from.id), limit: 1});
