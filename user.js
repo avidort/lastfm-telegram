@@ -1,27 +1,22 @@
 'use strict';
 
-/* TODO: User Management (currently hardcoded to avidori)
-    - based on redis (?)
-    - new users need to set their last.fm username
-    - users could toggle disable_web_page_preview
-    - messaging the bot directly could pop a random song recommendation based on last.fm's database
-*/
-
 class User {
-    constructor() {
-        // prep database
+    constructor(redis) {
+        this.redis = redis.createClient();
+        this.redis.on('ready', () => console.log('[redis] Ready'));
+        this.redis.on('error', (err) => console.log('[redis] %s', err));
     }
 
-    validate(userid) {
-        // return true if registered
+    get(userid) {
+        return new Promise((resolve, reject) => {
+            this.redis.getAsync(userid)
+                .then((res) => resolve(res))
+                .catch((err) => reject(err));
+        });
     }
 
-    add(userid, lastfm_user) {
-        // return true on success
-    }
-
-    webview(userid, toggle = -1) {
-        // return status if toggle equals -1, otherwise modify according to passed bool
+    set(userid, lastfm_user) {
+        this.redis.set(userid, lastfm_user);
     }
 }
 

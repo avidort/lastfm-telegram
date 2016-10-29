@@ -3,13 +3,14 @@
 const TelegramBotAPI = require('node-telegram-bot-api');
 
 class TelegramBot {
-    constructor(init, lfm, cfg) {
+    constructor(init, lfm, cfg, usr) {
         init();
         this.lfm = lfm;
         this.cfg = cfg;
+        this.usr = usr;
         this.bot = new TelegramBotAPI(cfg.telegramToken, {polling: true});
         this.events(this.bot);
-        console.log('Ready');
+        console.log('[bot] Ready');
     }
 
     events(bot) {
@@ -17,7 +18,7 @@ class TelegramBot {
 
         bot.on('inline_query', async (query) => {
             try {
-                let res = await this.lfm.user.getRecentTracksAsync({user: 'avidori', limit: 1});
+                let res = await this.lfm.user.getRecentTracksAsync({user: await this.usr.get(msg.from.id), limit: 1});
                 let track = this.getNowPlaying(res);
                 let thumbnails = this.getThumbnails(track, 1);
                 bot.answerInlineQuery(query.id, [{
@@ -39,9 +40,10 @@ class TelegramBot {
 
     async cmdNowPlaying(msg) {
         try {
-            let recentTracks = await this.lfm.user.getRecentTracksAsync({user: 'avidori', limit: 1});
+            let user = await this.usr.get(msg.from.id);
+            let recentTracks = await this.lfm.user.getRecentTracksAsync({user: user, limit: 1});
             let track = this.getNowPlaying(recentTracks);
-            this.bot.sendMessage(msg.from.id, `Now playing: ${track.name} by ${track.artist}`);
+            this.bot.sendMessage(msg.from.id, `${user} is now playing: ${track.name} by ${track.artist}`); 
         }
         catch (err) { throw err; }
     }

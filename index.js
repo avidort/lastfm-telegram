@@ -1,7 +1,9 @@
 'use strict';
 
-const Promise = require('bluebird');
+const bluebird = require('bluebird');
 const LastfmAPI = require('lastfmapi');
+const redisAPI = require('redis');
+const UserAPI = require('./user');
 let TelegramBot = require('./telegram-bot');
 
 const lfm = new LastfmAPI({
@@ -13,7 +15,9 @@ const cfg = {
     telegramToken: ''
 };
 
+bluebird.promisifyAll(lfm.user);
+bluebird.promisifyAll(redisAPI.RedisClient.prototype);
+
 TelegramBot = new TelegramBot(function() {
     console.log('Starting Last.fm Telegram Bot...');
-    Promise.promisifyAll(lfm.user);
-}, lfm, cfg);
+}, lfm, cfg, new UserAPI(redisAPI));
