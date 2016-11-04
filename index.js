@@ -6,15 +6,12 @@ const TelegramBotAPI = require('node-telegram-bot-api');
 const redisAPI = require('redis');
 const UserAPI = require('./user');
 const TelegramBot = require('./telegram-bot');
+const cfg = require('rc')('lfmbot');
 
 const lfm = new LastfmAPI({
-    api_key: '',
-    secret: ''
+    api_key: cfg.lastfmKey,
+    secret: cfg.lastfmSecret
 });
-
-const cfg = {
-    telegramToken: ''
-};
 
 bluebird.promisifyAll(lfm.user);
 bluebird.promisifyAll(redisAPI.RedisClient.prototype);
