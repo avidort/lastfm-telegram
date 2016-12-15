@@ -8,11 +8,7 @@ class User {
   }
 
   get(userid) {
-    return new Promise((resolve, reject) => {
-      this.redis.getAsync(userid)
-        .then((res) => resolve(res))
-        .catch((err) => reject(err));
-    });
+    return this.redis.getAsync(userid);
   }
 
   set(userid, lastfm_user) {

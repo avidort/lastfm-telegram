@@ -1,28 +1,28 @@
 'use strict';
 
 class TelegramBot {
-  constructor(init, lfm, cfg, bot, usr) {
+  constructor(init, lfm, config, bot, user) {
     init();
     this.lfm = lfm;
-    this.cfg = cfg;
-    this.bot = new bot(cfg.telegramToken, {polling: true});
-    this.usr = usr;
-    this.events(this.bot);
+    this.config = config;
+    this.bot = new bot(config.telegramToken, {polling: true});
+    this.user = user;
+    this.registerEvents(this.bot);
     console.log('[bot] Ready');
   }
 
-  events(bot) {
+  registerEvents(bot) {
     bot.on('message', (msg) => this.cmdNowPlaying(msg));
 
     bot.onText(/\/set (.+)/, (msg, match) => {
       let user = match[1];
-      this.usr.set(msg.from.id, user);
+      this.user.set(msg.from.id, user);
       bot.sendMessage(msg.from.id, `Tracking username set to ${user}`);
     });
 
     bot.on('inline_query', async (query) => {
       try {
-        let user = await this.usr.get(query.from.id);
+        let user = await this.user.get(query.from.id);
         if (user !== null) {
           let res = await this.lfm.user.getRecentTracksAsync({user: user, limit: 1});
           let track = this.getNowPlaying(res);
@@ -50,7 +50,7 @@ class TelegramBot {
 
   async cmdNowPlaying(msg) {
     try {
-      let user = await this.usr.get(msg.from.id);
+      let user = await this.user.get(msg.from.id);
       if (user !== null) {
         let recentTracks = await this.lfm.user.getRecentTracksAsync({user: user, limit: 1});
         let track = this.getNowPlaying(recentTracks);
