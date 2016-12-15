@@ -10,8 +10,8 @@ class User {
   get(userid) {
     return new Promise((resolve, reject) => {
       this.redis.getAsync(userid)
-          .then((res) => resolve(res))
-          .catch((err) => reject(err));
+        .then((res) => resolve(res))
+        .catch((err) => reject(err));
     });
   }
 
