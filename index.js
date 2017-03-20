@@ -1,12 +1,13 @@
 'use strict';
 
-const bluebird = require('bluebird');
-const LastfmAPI = require('lastfmapi');
-const TelegramBotAPI = require('node-telegram-bot-api');
-const redisAPI = require('redis');
-const UserAPI = require('./user');
-const TelegramBot = require('./telegram-bot');
-const config = require('rc')('lfmbot');
+const [bluebird, LastfmAPI, TelegramBotAPI, redisAPI] = [
+  require('bluebird'), require('lastfmapi'),
+  require('node-telegram-bot-api'), require('redis')
+];
+
+const [User, TelegramBot, config] = [
+  require('./user'), require('./telegram-bot'), require('rc')('lfmbot')
+];
 
 const lfm = new LastfmAPI({
   api_key: config.lastfmKey,
@@ -16,6 +17,5 @@ const lfm = new LastfmAPI({
 bluebird.promisifyAll(lfm.user);
 bluebird.promisifyAll(redisAPI.RedisClient.prototype);
 
-new TelegramBot(function() {
-  console.log('Starting Last.fm Telegram Bot...');
-}, lfm, config, TelegramBotAPI, new UserAPI(redisAPI));
+new TelegramBot(() => console.log('Starting Last.fm Telegram Bot...'),
+  lfm, config, TelegramBotAPI, new User(redisAPI));
